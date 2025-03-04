@@ -1,0 +1,352 @@
+openapi: 3.1.0
+info:
+  title: GitHub Repository API
+  description: Fetch details, contents, and commit history from a public GitHub repository.
+  version: 1.0.0
+servers:
+  - url: https://api.github.com
+paths:
+  /repos/{owner}/{repo}:
+    get:
+      operationId: getRepoDetails
+      summary: Get repository details
+      description: Fetch metadata about a public GitHub repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Repository owner's GitHub username.
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Repository name.
+      responses:
+        '200':
+          description: Repository details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  full_name:
+                    type: string
+                  description:
+                    type: string
+                  html_url:
+                    type: string
+                  language:
+                    type: string
+                  topics:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Repository not found.
+
+  /repos/{owner}/{repo}/contents:
+    get:
+      operationId: listRepoContents
+      summary: List repository contents
+      description: List the files and directories in a repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Path to a specific directory (default is root).
+      responses:
+        '200':
+          description: Repository contents retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                    path:
+                      type: string
+                    download_url:
+                      type: string
+        '404':
+          description: Repository not found.
+
+  /repos/{owner}/{repo}/contents/{path}:
+    get:
+      operationId: getFileContent
+      summary: Get file content
+      description: Retrieve the content of a specific file in a repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Path to the file in the repository.
+      responses:
+        '200':
+          description: File content retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  content:
+                    type: string
+                    description: Base64-encoded file content.
+                  download_url:
+                    type: string
+        '404':
+          description: File not found.
+
+  /repos/{owner}/{repo}/commits:
+    get:
+      operationId: listRepoCommits
+      summary: List repository commits
+      description: Fetch recent commits from a repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of commits retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    sha:
+                      type: string
+                    commit:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        author:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            date:
+                              type: string
+        '404':
+          description: Repository not found.
+openapi: 3.1.0
+info:
+  title: GitHub Repository API
+  description: Fetch details, contents, and commit history from a public GitHub repository.
+  version: 1.0.0
+servers:
+  - url: https://api.github.com
+paths:
+  /repos/{owner}/{repo}:
+    get:
+      operationId: getRepoDetails
+      summary: Get repository details
+      description: Fetch metadata about a public GitHub repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Repository owner's GitHub username.
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Repository name.
+      responses:
+        '200':
+          description: Repository details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  full_name:
+                    type: string
+                  description:
+                    type: string
+                  html_url:
+                    type: string
+                  language:
+                    type: string
+                  topics:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Repository not found.
+
+  /repos/{owner}/{repo}/contents:
+    get:
+      operationId: listRepoContents
+      summary: List repository contents
+      description: List the files and directories in a repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Path to a specific directory (default is root).
+      responses:
+        '200':
+          description: Repository contents retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                    path:
+                      type: string
+                    download_url:
+                      type: string
+        '404':
+          description: Repository not found.
+
+  /repos/{owner}/{repo}/contents/{path}:
+    get:
+      operationId: getFileContent
+      summary: Get file content
+      description: Retrieve the content of a specific file in a repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Path to the file in the repository.
+      responses:
+        '200':
+          description: File content retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  content:
+                    type: string
+                    description: Base64-encoded file content.
+                  download_url:
+                    type: string
+        '404':
+          description: File not found.
+
+  /repos/{owner}/{repo}/commits:
+    get:
+      operationId: listRepoCommits
+      summary: List repository commits
+      description: Fetch recent commits from a repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of commits retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    sha:
+                      type: string
+                    commit:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        author:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            date:
+                              type: string
+        '404':
+          description: Repository not found.
