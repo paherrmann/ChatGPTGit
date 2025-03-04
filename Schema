@@ -1,10 +1,12 @@
 openapi: 3.1.0
 info:
-  title: GitHub Repository API
-  description: Fetch details, contents, and commit history from a public GitHub repository.
-  version: 1.0.0
+  title: GitHub Repository Automation API
+  description: Automate GitHub repository operations like branching, file editing, committing, and pushing changes.
+  version: 2.0.0
+
 servers:
   - url: https://api.github.com
+
 paths:
   /repos/{owner}/{repo}:
     get:
@@ -17,43 +19,20 @@ paths:
           required: true
           schema:
             type: string
-          description: Repository owner's GitHub username.
         - name: repo
           in: path
           required: true
           schema:
             type: string
-          description: Repository name.
       responses:
         '200':
           description: Repository details retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  full_name:
-                    type: string
-                  description:
-                    type: string
-                  html_url:
-                    type: string
-                  language:
-                    type: string
-                  topics:
-                    type: array
-                    items:
-                      type: string
-        '404':
-          description: Repository not found.
-
-  /repos/{owner}/{repo}/contents:
-    get:
-      operationId: listRepoContents
-      summary: List repository contents
-      description: List the files and directories in a repository.
+  
+  /repos/{owner}/{repo}/branches:
+    post:
+      operationId: createBranch
+      summary: Create a new branch
+      description: Creates a new branch from a specified base branch.
       parameters:
         - name: owner
           in: path
@@ -65,32 +44,24 @@ paths:
           required: true
           schema:
             type: string
-        - name: path
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Path to a specific directory (default is root).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_branch:
+                  type: string
+                  description: The branch to branch off from.
+                new_branch:
+                  type: string
+                  description: The name of the new branch.
       responses:
-        '200':
-          description: Repository contents retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    type:
-                      type: string
-                    path:
-                      type: string
-                    download_url:
-                      type: string
-        '404':
-          description: Repository not found.
+        '201':
+          description: Branch created successfully.
+        '400':
+          description: Invalid request.
 
   /repos/{owner}/{repo}/contents/{path}:
     get:
@@ -117,119 +88,11 @@ paths:
       responses:
         '200':
           description: File content retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  content:
-                    type: string
-                    description: Base64-encoded file content.
-                  download_url:
-                    type: string
-        '404':
-          description: File not found.
 
-  /repos/{owner}/{repo}/commits:
-    get:
-      operationId: listRepoCommits
-      summary: List repository commits
-      description: Fetch recent commits from a repository.
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: List of commits retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    sha:
-                      type: string
-                    commit:
-                      type: object
-                      properties:
-                        message:
-                          type: string
-                        author:
-                          type: object
-                          properties:
-                            name:
-                              type: string
-                            date:
-                              type: string
-        '404':
-          description: Repository not found.
-openapi: 3.1.0
-info:
-  title: GitHub Repository API
-  description: Fetch details, contents, and commit history from a public GitHub repository.
-  version: 1.0.0
-servers:
-  - url: https://api.github.com
-paths:
-  /repos/{owner}/{repo}:
-    get:
-      operationId: getRepoDetails
-      summary: Get repository details
-      description: Fetch metadata about a public GitHub repository.
-      parameters:
-        - name: owner
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Repository owner's GitHub username.
-        - name: repo
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Repository name.
-      responses:
-        '200':
-          description: Repository details retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  full_name:
-                    type: string
-                  description:
-                    type: string
-                  html_url:
-                    type: string
-                  language:
-                    type: string
-                  topics:
-                    type: array
-                    items:
-                      type: string
-        '404':
-          description: Repository not found.
-
-  /repos/{owner}/{repo}/contents:
-    get:
-      operationId: listRepoContents
-      summary: List repository contents
-      description: List the files and directories in a repository.
+    put:
+      operationId: updateFile
+      summary: Create or update a file
+      description: Writes new content to a file or creates it if it does not exist.
       parameters:
         - name: owner
           in: path
@@ -242,37 +105,110 @@ paths:
           schema:
             type: string
         - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Path to the file.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: Commit message.
+                content:
+                  type: string
+                  description: Base64-encoded file content.
+                branch:
+                  type: string
+                  description: Branch where changes should be made.
+      responses:
+        '200':
+          description: File updated successfully.
+        '201':
+          description: File created successfully.
+
+  /repos/{owner}/{repo}/commits:
+    post:
+      operationId: commitChanges
+      summary: Commit multiple changes
+      description: Stages and commits multiple file changes.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      path:
+                        type: string
+                        description: File path.
+                      content:
+                        type: string
+                        description: Base64-encoded content.
+                message:
+                  type: string
+                  description: Commit message.
+                branch:
+                  type: string
+                  description: Branch name.
+      responses:
+        '201':
+          description: Changes committed successfully.
+
+  /repos/{owner}/{repo}/push:
+    post:
+      operationId: pushBranch
+      summary: Push local changes
+      description: Pushes the committed changes of a branch to the remote repository.
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: branch
           in: query
-          required: false
+          required: true
           schema:
             type: string
-          description: Path to a specific directory (default is root).
+          description: The branch to push.
       responses:
         '200':
-          description: Repository contents retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    type:
-                      type: string
-                    path:
-                      type: string
-                    download_url:
-                      type: string
-        '404':
-          description: Repository not found.
+          description: Changes pushed successfully.
+        '400':
+          description: Error pushing changes.
 
-  /repos/{owner}/{repo}/contents/{path}:
-    get:
-      operationId: getFileContent
-      summary: Get file content
-      description: Retrieve the content of a specific file in a repository.
+  /repos/{owner}/{repo}/pulls:
+    post:
+      operationId: createPullRequest
+      summary: Create a pull request
+      description: Submits a pull request to merge changes from one branch to another.
       parameters:
         - name: owner
           in: path
@@ -284,35 +220,36 @@ paths:
           required: true
           schema:
             type: string
-        - name: path
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Path to the file in the repository.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Title of the pull request.
+                body:
+                  type: string
+                  description: Description of the pull request.
+                head:
+                  type: string
+                  description: The branch where changes are coming from.
+                base:
+                  type: string
+                  description: The branch where changes should be merged.
       responses:
-        '200':
-          description: File content retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  content:
-                    type: string
-                    description: Base64-encoded file content.
-                  download_url:
-                    type: string
-        '404':
-          description: File not found.
+        '201':
+          description: Pull request created successfully.
+        '400':
+          description: Error creating pull request.
 
-  /repos/{owner}/{repo}/commits:
-    get:
-      operationId: listRepoCommits
-      summary: List repository commits
-      description: Fetch recent commits from a repository.
+  /repos/{owner}/{repo}/issues:
+    post:
+      operationId: createIssue
+      summary: Create a GitHub issue
+      description: Opens a new issue in the repository.
       parameters:
         - name: owner
           in: path
@@ -324,29 +261,26 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Issue title.
+                body:
+                  type: string
+                  description: Issue description.
+                labels:
+                  type: array
+                  items:
+                    type: string
+                  description: Labels for the issue.
       responses:
-        '200':
-          description: List of commits retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    sha:
-                      type: string
-                    commit:
-                      type: object
-                      properties:
-                        message:
-                          type: string
-                        author:
-                          type: object
-                          properties:
-                            name:
-                              type: string
-                            date:
-                              type: string
-        '404':
-          description: Repository not found.
+        '201':
+          description: Issue created successfully.
+        '400':
+          description: Error creating issue.
